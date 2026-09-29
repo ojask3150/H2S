@@ -1,0 +1,42 @@
+{
+  "dem": {
+    "id": "SYNTH-DEM-10m (static fixture)",
+    "vertical_datum": "MSL",
+    "resolution_m": 10
+  },
+  "mode": "static",
+  "infrastructure": [
+    {
+      "id": "SUB-A",
+      "type": "substation",
+      "elevation_m": 1.5,
+      "serves": ["SECTOR-A"]
+    },
+    {
+      "id": "FDR-F2",
+      "type": "power_feeder",
+      "elevation_m": 0.4,
+      "serves": ["SECTOR-A"],
+      "path_crossings": ["R-5 causeway @ 0.4m DEM"]
+    },
+    {
+      "id": "SHEL-M1",
+      "type": "medical_shelter",
+      "elevation_m": 3.8,
+      "capacity_beds": 450
+    },
+    {
+      "id": "SHEL-M2",
+      "type": "medical_shelter",
+      "elevation_m": 1.1,
+      "capacity_beds": 120
+    }
+  ],
+  "arterial_roads": [
+    { "id": "R-5", "type": "causeway", "dem_elevation_m": 0.4 },
+    { "id": "R-3", "type": "coastal_arterial", "dem_elevation_m": 0.8 },
+    { "id": "R-1", "type": "primary_arterial", "dem_elevation_m": 2.5 },
+    { "id": "R-7", "type": "inland_arterial", "dem_elevation_m": 6.2 },
+    { "id": "R-9", "type": "inland_arterial", "dem_elevation_m": 5.8 }
+  ]
+}

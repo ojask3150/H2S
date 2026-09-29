@@ -1,0 +1,47 @@
+"""Test fixtures: synthetic NHC advisory text.
+
+All values are synthetic. The NHC text mirrors the real TCM product format.
+"""
+
+NHC_ADVISORY = """
+ZCZC MIATCPAT3 ALL
+TTAA00 KNHC DDHHMM
+BULLETIN
+Tropical Storm Synth Advisory Number  12
+NWS National Hurricane Center Miami FL       AL092026
+1200 UTC WED SEP 30 2026
+
+...SYNTH MOVING NORTHWEST TOWARD THE SYNTH COAST...
+
+SUMMARY OF 1200 UTC INFORMATION
+----------------------------------
+LOCATION...23.4N 78.2W
+MAXIMUM SUSTAINED WINDS...85 KT...GUSTS 105 KT
+PRESENT MOTION TOWARD NW OR 315 DEGREES AT 12 KT
+MINIMUM CENTRAL PRESSURE...965 MB...27.46 INCHES
+
+WATCHES AND WARNINGS
+------------------------------------
+A STORM SURGE WATCH IS IN EFFECT FOR...
+
+DISCUSSION AND OUTLOOK
+----------------------
+At 1200 UTC, the center of Tropical Storm Synth was located near latitude
+23.4 North, longitude 78.2 West.
+
+MAX WINDS... 90 KT...GUSTS 110 KT
+
+FORECAST VALID 01/0000Z 24.2N 79.1W
+MAX WIND 95 KT...GUSTS 115 KT
+
+FORECAST VALID 01/1200Z 25.1N 80.0W
+MAX WIND 100 KT...GUSTS 120 KT
+
+FORECAST VALID 02/0000Z 26.0N 80.9W
+MAX WIND 105 KT...GUSTS 125 KT
+
+NEXT ADVISORY... 1800 UTC
+
+$$
+FORECASTER SYNTH
+"""

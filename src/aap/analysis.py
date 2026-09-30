@@ -96,10 +96,12 @@ class SurgeCurve:
 
 
 def _fmt_t(hours_before: Optional[float], landfall_dt: datetime) -> str:
+    # hours_before is stored as hours-relative-to-landfall (negative == before).
+    # e.g. -14.0 renders "T-14.0h" and resolves to landfall_dt + (-14h).
     if hours_before is None:
         return "NONE"
-    abs_dt = landfall_dt - timedelta(hours=hours_before)
-    return f"T-{hours_before:.1f}h ({abs_dt.strftime('%Y-%m-%dT%H:%MZ')})"
+    abs_dt = landfall_dt + timedelta(hours=hours_before)
+    return f"T{hours_before:.1f}h ({abs_dt.strftime('%Y-%m-%dT%H:%MZ')})"
 
 
 def _pluvial_crossing_hours_before(rain_mm: Optional[float]) -> Optional[float]:
@@ -382,9 +384,11 @@ def build_assessment(
 
     # --- Automated advisories ---------------------------------------------- #
     def lead(cross_h: Optional[float]) -> float:
+        # cross_h is negative (hours before landfall); crossing occurs at
+        # eta_h + cross_h hours from now. Lead time is that horizon, floored at 0.
         if cross_h is None:
             return 0.0
-        return max(0.0, round(eta_h - cross_h, 1))
+        return max(0.0, round(eta_h + cross_h, 1))
 
     advisories: list[Advisory] = []
     rank = 1

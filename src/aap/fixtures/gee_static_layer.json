@@ -10,33 +10,62 @@
       "id": "SUB-A",
       "type": "substation",
       "elevation_m": 1.5,
-      "serves": ["SECTOR-A"]
+      "serves": ["SECTOR-A"],
+      "geom": {"type": "Point", "coordinates": [87.98, 17.42]}
     },
     {
       "id": "FDR-F2",
       "type": "power_feeder",
       "elevation_m": 0.4,
       "serves": ["SECTOR-A"],
-      "path_crossings": ["R-5 causeway @ 0.4m DEM"]
+      "path_crossings": ["R-5 causeway @ 0.4m DEM"],
+      "geom": {"type": "Point", "coordinates": [87.95, 17.40]}
     },
     {
       "id": "SHEL-M1",
       "type": "medical_shelter",
       "elevation_m": 3.8,
-      "capacity_beds": 450
+      "capacity_beds": 450,
+      "geom": {"type": "Point", "coordinates": [88.05, 17.55]}
     },
     {
       "id": "SHEL-M2",
       "type": "medical_shelter",
       "elevation_m": 1.1,
-      "capacity_beds": 120
+      "capacity_beds": 120,
+      "geom": {"type": "Point", "coordinates": [87.99, 17.44]}
     }
   ],
   "arterial_roads": [
-    { "id": "R-5", "type": "causeway", "dem_elevation_m": 0.4 },
-    { "id": "R-3", "type": "coastal_arterial", "dem_elevation_m": 0.8 },
-    { "id": "R-1", "type": "primary_arterial", "dem_elevation_m": 2.5 },
-    { "id": "R-7", "type": "inland_arterial", "dem_elevation_m": 6.2 },
-    { "id": "R-9", "type": "inland_arterial", "dem_elevation_m": 5.8 }
+    {
+      "id": "R-5",
+      "type": "causeway",
+      "dem_elevation_m": 0.4,
+      "geom": {"type": "LineString", "coordinates": [[87.93, 17.39], [87.97, 17.43]]}
+    },
+    {
+      "id": "R-3",
+      "type": "coastal_arterial",
+      "dem_elevation_m": 0.8,
+      "geom": {"type": "LineString", "coordinates": [[87.96, 17.41], [88.02, 17.47]]}
+    },
+    {
+      "id": "R-1",
+      "type": "primary_arterial",
+      "dem_elevation_m": 2.5,
+      "geom": {"type": "LineString", "coordinates": [[88.00, 17.45], [88.08, 17.52]]}
+    },
+    {
+      "id": "R-7",
+      "type": "inland_arterial",
+      "dem_elevation_m": 6.2,
+      "geom": {"type": "LineString", "coordinates": [[88.05, 17.55], [88.15, 17.64]]}
+    },
+    {
+      "id": "R-9",
+      "type": "inland_arterial",
+      "dem_elevation_m": 5.8,
+      "geom": {"type": "LineString", "coordinates": [[88.08, 17.52], [88.18, 17.60]]}
+    }
   ]
 }

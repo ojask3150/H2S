@@ -41,6 +41,14 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+On Windows PowerShell, use the native Python environment instead:
+
+```powershell
+python -m venv .venv-windows
+.\.venv-windows\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
 Run fully offline (bundled Bay of Bengal demo storm + synthetic DEM layers):
 
 ```bash
@@ -49,10 +57,27 @@ GEE_MODE=static MET_SOURCES=static PYTHONPATH=src \
   uvicorn aap.service:app --reload --port 8000
 ```
 
+PowerShell:
+
+```powershell
+Copy-Item .env.example .env  # optional; defaults work
+$env:GEE_MODE = "static"
+$env:MET_SOURCES = "static"
+$env:PYTHONPATH = "src"
+uvicorn aap.service:app --reload --port 8000
+```
+
 Tests:
 
 ```bash
 PYTHONPATH=src:tests python -m pytest tests/ -q
+```
+
+PowerShell:
+
+```powershell
+$env:PYTHONPATH = "src;tests"
+python -m pytest tests/ -q
 ```
 
 ### Endpoints

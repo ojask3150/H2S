@@ -263,6 +263,8 @@ header.topbar {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .map-wrap {
@@ -278,13 +280,20 @@ header.topbar {
   gap: 16px;
   border-left: 1px solid var(--border);
   background: var(--bg);
+  min-width: 0;
+  min-height: 0;
+  scrollbar-gutter: stable;
 }
 
 .card {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
+  min-width: 0;
 }
 
 .card h2 {
@@ -300,6 +309,11 @@ header.topbar {
 
 .card .body {
   padding: 6px 0;
+  max-height: clamp(170px, 28vh, 300px);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .row {
@@ -313,7 +327,7 @@ header.topbar {
 
 .row .head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   justify-content: space-between;
 }
@@ -321,6 +335,8 @@ header.topbar {
 .row .title {
   font-weight: 600;
   font-size: 14px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .row .detail {
@@ -484,4 +500,58 @@ header.topbar {
   padding: 5px 12px;
   font-size: 11px;
   color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .rail {
+    max-height: 34vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(280px, 45vh) minmax(0, 1fr);
+    overflow-y: auto;
+  }
+
+  .map-wrap {
+    min-height: 280px;
+  }
+
+  .panels {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    overflow: visible;
+  }
+
+  .card .body {
+    max-height: min(35vh, 280px);
+  }
+}
+
+@media (max-width: 560px) {
+  header.topbar {
+    padding: 10px 14px;
+    gap: 12px;
+  }
+
+  .topbar-metrics {
+    gap: 12px 18px;
+    margin-left: 0;
+  }
+
+  .panels {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .storm-facts {
+    grid-template-columns: 1fr;
+  }
 }

@@ -138,6 +138,22 @@ A dark geospatial dashboard (Leaflet) plots the storm track, infrastructure
 (colored by surge risk), and arterial roads (flood-risk vs. safe inland routes),
 alongside panels for all four assessment outputs and the dispatch bundle.
 
+## Deploy on Render
+
+The repository includes `render.yaml`, which creates two free web services:
+
+1. `h2s-backend` — FastAPI with the fully offline demo configuration.
+2. `h2s-frontend` — Next.js dashboard, proxying `/api/*` to the backend.
+
+In Render, choose **New > Blueprint**, connect this repository, and apply the
+Blueprint. No API keys are required for the default deployment. The backend
+uses the bundled static storm and DEM fixtures, and the frontend receives the
+backend hostname automatically through `BACKEND_URL`.
+
+For live feeds, change the backend environment variables in Render after the
+first deploy. Live Earth Engine access requires valid Earth Engine credentials
+and project configuration; NHC/JTWC feeds remain public and keyless.
+
 ## Safety note
 
 The dispatcher **stages** SMS/email and smart-contract payloads (`STAGED` /

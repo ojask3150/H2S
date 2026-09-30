@@ -25,6 +25,7 @@ import json
 import logging
 import re
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Optional
 
 import httpx
@@ -33,6 +34,8 @@ from .config import Settings
 from .models import MeteorologicalData, StormSurge, TrackPoint
 
 log = logging.getLogger(__name__)
+
+_MET_FIXTURE = Path(__file__).resolve().parent / "fixtures" / "met_static.json"
 
 _UA = {"User-Agent": "anticipatory-action-platform/0.1 (ingest)"}
 
@@ -60,20 +63,30 @@ async def _fetch_text(url: str, client: httpx.AsyncClient, timeout: float = 20.0
     return resp.text
 
 
-def _parse_lat(token: str) -> float:
-    m = re.fullmatch(r"(-?[\d.]+)([NS])", token.strip(), re.I)
+def _parse_coord(token: str, pos: str, neg: str) -> float:
+    """Parse an ATCF coordinate token.
+
+    Handles both real ATCF integer-tenths with a hemisphere suffix
+    ('234N' -> 23.4) and decimal-degree tokens with an optional hemisphere or
+    sign ('17.8N', '-23.4', '88.1E'). A hemisphere of ``neg`` (S / W) negates.
+    """
+    m = re.fullmatch(rf"(-?\d+(?:\.\d+)?)\s*([{pos}{neg}{pos.lower()}{neg.lower()}]?)", token.strip())
     if not m:
-        raise FeedError(f"bad latitude token: {token!r}")
+        raise FeedError(f"bad coordinate token: {token!r}")
     val = float(m.group(1))
-    return -val if m.group(2).upper() == "S" else val
+    hemi = m.group(2).upper()
+    # Integer + hemisphere is the real ATCF tenths-of-degrees convention.
+    if hemi and "." not in token:
+        val /= 10.0
+    return -val if hemi == neg else val
+
+
+def _parse_lat(token: str) -> float:
+    return _parse_coord(token, "N", "S")
 
 
 def _parse_lon(token: str) -> float:
-    m = re.fullmatch(r"(-?[\d.]+)([WE])", token.strip(), re.I)
-    if not m:
-        raise FeedError(f"bad longitude token: {token!r}")
-    val = float(m.group(1))
-    return -val if m.group(2).upper() == "W" else val
+    return _parse_coord(token, "E", "W")
 
 
 # --------------------------------------------------------------------------- #
@@ -324,6 +337,18 @@ async def fetch_custom(settings: Settings, client: httpx.AsyncClient) -> Meteoro
         raise FeedError(f"custom: payload failed schema validation: {exc}") from exc
 
 
+async def fetch_static(settings: Settings, client: httpx.AsyncClient) -> MeteorologicalData:
+    """Load the bundled offline met fixture (Bay of Bengal demo storm).
+
+    Requires no network or credentials; pairs with GEE_MODE=static so the whole
+    platform (and the frontend) runs fully offline.
+    """
+    try:
+        return MeteorologicalData.model_validate(json.loads(_MET_FIXTURE.read_text(encoding="utf-8")))
+    except (OSError, ValueError) as exc:
+        raise FeedError(f"static: cannot load met fixture: {exc}") from exc
+
+
 async def fetch_met(settings: Settings, client: httpx.AsyncClient | None = None) -> MeteorologicalData:
     """Try each configured source in order; first success wins."""
     owned = client is None
@@ -332,7 +357,12 @@ async def fetch_met(settings: Settings, client: httpx.AsyncClient | None = None)
     try:
         errors: list[str] = []
         for source in settings.met_source_list:
-            adapter = {"nhc": fetch_nhc, "jtwc": fetch_jtwc, "custom": fetch_custom}.get(source)
+            adapter = {
+                "nhc": fetch_nhc,
+                "jtwc": fetch_jtwc,
+                "custom": fetch_custom,
+                "static": fetch_static,
+            }.get(source)
             if adapter is None:
                 errors.append(f"{source}: unknown source")
                 continue

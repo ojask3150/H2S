@@ -35,6 +35,15 @@ class Settings(BaseSettings):
     trigger_rainfall_mm_48h: float = 350.0
     trigger_surge_m: float = 2.0
 
+    # Gemini multimodal reasoning engine
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-3.7-flash"
+    gemini_thinking_level: str = "high"
+    # "auto"  -> Gemini when a key is present, else deterministic pipeline
+    # "gemini"-> require Gemini (error if unavailable)
+    # "deterministic" -> always use the local analysis pipeline
+    reasoning_engine: str = "auto"
+
     log_level: str = "INFO"
 
     @property

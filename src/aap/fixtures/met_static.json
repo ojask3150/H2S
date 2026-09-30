@@ -1,0 +1,19 @@
+{
+  "storm_id": "SYNTH-BOB-01",
+  "source": "static fixture (Bay of Bengal demo)",
+  "trajectory": [
+    {"lat": 17.80, "lon": 88.10, "timestamp_utc": "2026-09-29T06:00:00Z", "status": "current"},
+    {"lat": 17.62, "lon": 88.02, "timestamp_utc": "2026-09-29T12:00:00Z", "status": "forecast"},
+    {"lat": 17.48, "lon": 87.96, "timestamp_utc": "2026-09-29T18:00:00Z", "status": "forecast"},
+    {"lat": 17.40, "lon": 87.94, "timestamp_utc": "2026-09-30T00:00:00Z", "status": "landfall_synthetic"}
+  ],
+  "eta_landfall_hours": 18.0,
+  "sustained_wind_kmh": 165,
+  "wind_gust_kmh": 185,
+  "predicted_rainfall_mm_48h": 420,
+  "storm_surge": {
+    "peak_height_m": 2.2,
+    "confidence_interval_m": [1.9, 2.6],
+    "surge_curve_central": {"T-16h": 0.3, "T-14h": 1.5, "T-10h": 1.9, "T-4h": 2.2, "T+2h": 1.8}
+  }
+}

@@ -8,7 +8,8 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 COPY frontend/ ./
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    NEXT_EXPORT=true
 RUN npm run build
 
 # Stage 2: Production Python backend serving API & static frontend

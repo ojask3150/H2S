@@ -1,13 +1,24 @@
 import type { Scene, StormCatalog } from "./types";
 
-// Calls go through the Next.js rewrite proxy (/api/* -> FastAPI).
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL
+  ? process.env.NEXT_PUBLIC_BACKEND_URL.replace(/\/$/, "")
+  : "/api";
+
+function getApiUrl(endpoint: string): string {
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const apiPath = path.startsWith("/api") ? path : `/api${path}`;
+  if (API_BASE.startsWith("http")) {
+    return `${API_BASE}${apiPath}`;
+  }
+  return apiPath;
+}
 
 export async function fetchScene(storm?: string, mode?: string): Promise<Scene> {
   const params = new URLSearchParams();
   if (storm) params.set("storm", storm);
   if (mode) params.set("mode", mode);
   const qs = params.toString() ? `?${params.toString()}` : "";
-  const res = await fetch(`/api/scene${qs}`, { cache: "no-store" });
+  const res = await fetch(getApiUrl(`/scene${qs}`), { cache: "no-store" });
   if (!res.ok) {
     const detail = await res.text();
     throw new Error(`scene fetch failed (${res.status}): ${detail}`);
@@ -16,7 +27,7 @@ export async function fetchScene(storm?: string, mode?: string): Promise<Scene> 
 }
 
 export async function fetchStorms(): Promise<StormCatalog> {
-  const res = await fetch(`/api/storms`, { cache: "no-store" });
+  const res = await fetch(getApiUrl("/storms"), { cache: "no-store" });
   if (!res.ok) {
     const detail = await res.text();
     throw new Error(`storms fetch failed (${res.status}): ${detail}`);

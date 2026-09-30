@@ -14,13 +14,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
 import httpx
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import APIRouter, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import catalog
@@ -54,6 +56,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+router = APIRouter()
+
 
 def _safe_settings(settings: Settings) -> dict:
     return {
@@ -75,7 +79,7 @@ def _safe_settings(settings: Settings) -> dict:
     }
 
 
-@app.get("/health")
+@router.get("/health")
 def health() -> dict:
     settings = get_settings()
     return {"status": "ok", "time_utc": datetime.now(timezone.utc).isoformat(), "config": _safe_settings(settings)}
@@ -147,7 +151,7 @@ async def _resolve_scene(
     return layers, met, meta
 
 
-@app.get("/storms")
+@router.get("/storms")
 async def storms(
     mode: str | None = Query(default=None, description="Override GEE mode for the live probe"),
 ) -> dict:
@@ -170,7 +174,7 @@ async def storms(
     return {"live": live, "storms": entries}
 
 
-@app.get("/assessment", response_model=AssessmentOutput)
+@router.get("/assessment", response_model=AssessmentOutput)
 async def assessment(
     storm: str | None = Query(default=None, description="Catalog storm id, 'live', or blank for demo"),
     mode: str | None = Query(default=None, description="Override GEE mode: 'live' or 'static'"),
@@ -210,7 +214,7 @@ async def _load_met_and_layers(settings: Settings, gee_mode: str):
     return layers, met
 
 
-@app.post("/assessment/reasoned")
+@router.post("/assessment/reasoned")
 async def assessment_reasoned(req: ReasonedRequest) -> JSONResponse:
     """Run the Gemini multimodal engine (falls back to the deterministic pipeline)."""
     settings = get_settings()
@@ -236,7 +240,7 @@ async def assessment_reasoned(req: ReasonedRequest) -> JSONResponse:
     )
 
 
-@app.get("/dispatch", response_model=DispatchBundle)
+@router.get("/dispatch", response_model=DispatchBundle)
 async def dispatch(
     storm: str | None = Query(default=None, description="Catalog storm id, 'live', or blank for demo"),
     mode: str | None = Query(default=None, description="Override GEE mode: 'live' or 'static'"),
@@ -249,7 +253,7 @@ async def dispatch(
     return JSONResponse(content=bundle.model_dump(), status_code=200)
 
 
-@app.get("/scene")
+@router.get("/scene")
 async def scene(
     storm: str | None = Query(default=None, description="Catalog storm id, 'live', or blank for demo"),
     mode: str | None = Query(default=None, description="Override GEE mode: 'live' or 'static'"),
@@ -275,6 +279,32 @@ async def scene(
     return JSONResponse(content=payload, status_code=200)
 
 
-@app.get("/schema")
+@router.get("/schema")
 def schema() -> dict:
     return AssessmentOutput.model_json_schema()
+
+
+# Expose API endpoints both at root (e.g. /health, /scene) and under /api/* (e.g. /api/health, /api/scene)
+app.include_router(router)
+app.include_router(router, prefix="/api")
+
+# Static files serving for production static frontend bundle (e.g. compiled Next.js export)
+static_dir = os.environ.get("STATIC_DIR") or os.path.join(
+    os.path.dirname(__file__), "..", "..", "frontend", "out"
+)
+static_dir = os.path.abspath(static_dir)
+
+if os.path.exists(static_dir):
+    next_assets_dir = os.path.join(static_dir, "_next")
+    if os.path.exists(next_assets_dir):
+        app.mount("/_next", StaticFiles(directory=next_assets_dir), name="next_assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_static_or_spa(full_path: str):
+        target_file = os.path.join(static_dir, full_path)
+        if full_path and os.path.isfile(target_file):
+            return FileResponse(target_file)
+        index_file = os.path.join(static_dir, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Not Found")

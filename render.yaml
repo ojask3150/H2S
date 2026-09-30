@@ -1,14 +1,11 @@
 services:
   - type: web
-    name: h2s-backend
-    runtime: python
+    name: h2s-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn aap.service:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
-      - key: PYTHONPATH
-        value: src
       - key: GEE_MODE
         value: static
       - key: MET_SOURCES
@@ -17,20 +14,3 @@ services:
         value: deterministic
       - key: LOG_LEVEL
         value: INFO
-
-  - type: web
-    name: h2s-frontend
-    runtime: node
-    plan: free
-    rootDir: frontend
-    buildCommand: npm ci && npm run build
-    startCommand: npm run start -- -p $PORT
-    healthCheckPath: /
-    envVars:
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: h2s-backend
-          property: host
-      - key: NEXT_TELEMETRY_DISABLED
-        value: "1"

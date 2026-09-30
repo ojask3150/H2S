@@ -140,19 +140,32 @@ alongside panels for all four assessment outputs and the dispatch bundle.
 
 ## Deploy on Render
 
-The repository includes `render.yaml`, which creates two free web services:
+The repository includes a production multi-stage `Dockerfile` and `render.yaml` configured for **Render Free Tier**:
 
-1. `h2s-backend` — FastAPI with the fully offline demo configuration.
-2. `h2s-frontend` — Next.js dashboard, proxying `/api/*` to the backend.
+1. `h2s-app` — Unified single-container web service serving both FastAPI backend APIs and static Next.js Leaflet dashboard.
 
-In Render, choose **New > Blueprint**, connect this repository, and apply the
-Blueprint. No API keys are required for the default deployment. The backend
-uses the bundled static storm and DEM fixtures, and the frontend receives the
-backend hostname automatically through `BACKEND_URL`.
+### Option A: Deploy via Render Blueprint (Recommended)
+1. Push this repository to GitHub/GitLab.
+2. In Render Dashboard, choose **New > Blueprint**, connect this repository, and apply the Blueprint.
+3. Render will build the Docker container and deploy the app on the Free Tier automatically.
 
-For live feeds, change the backend environment variables in Render after the
-first deploy. Live Earth Engine access requires valid Earth Engine credentials
-and project configuration; NHC/JTWC feeds remain public and keyless.
+### Option B: Deploy via Render Web Service
+1. Choose **New > Web Service** in Render.
+2. Select **Docker** as the Runtime.
+3. Point to `Dockerfile` in the root directory.
+
+No API keys are required for default offline demo deployment.
+
+### Local Docker Testing
+Build and run locally with Docker:
+
+```bash
+docker build -t h2s-app .
+docker run -p 8000:8000 h2s-app
+```
+Access dashboard at `http://localhost:8000/` and health check at `http://localhost:8000/health`.
+
+For live feeds, set environment variables (`GEMINI_API_KEY`, `GEE_MODE=live`, `GEE_SERVICE_ACCOUNT_JSON`, etc.) in Render Dashboard environment settings after deployment.
 
 ## Safety note
 

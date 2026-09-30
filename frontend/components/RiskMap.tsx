@@ -65,9 +65,11 @@ export default function RiskMap({ scene }: { scene: Scene }) {
         url={
           process.env.NEXT_PUBLIC_MAP_TILE_URL ||
           (process.env.NEXT_PUBLIC_CARTO_KEY
-            ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${process.env.NEXT_PUBLIC_CARTO_KEY}`
-            : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png")
+            ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_CARTO_KEY}`
+            : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png")
         }
+        subdomains="abcd"
+        maxZoom={19}
       />
 
       {/* Storm trajectory */}
